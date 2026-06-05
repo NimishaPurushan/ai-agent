@@ -1,0 +1,20 @@
+# Python
+
+*.iml
+.vscode/
+.idea/
+# IDE
+
+.vite/
+dist/
+node_modules/
+# Node
+
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.env
+venv/
+.venv/
+*.pyc
+__pycache__/
