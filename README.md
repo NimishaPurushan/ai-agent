@@ -34,6 +34,18 @@ Then set `MCP_SERVERS_CONFIG=./mcp_servers.json` in `backend/.env` (already set 
 The default examples need Node (`npx`) and/or `uvx` installed.
 Verify tools after backend boot: `GET http://localhost:8000/api/tools`.
 
+### 2c. (Optional) Enable LangSmith monitoring
+
+Create a LangSmith project and API key, then add these values to `backend/.env`:
+
+```dotenv
+LANGSMITH_TRACING=true
+LANGSMITH_API_KEY=lsv2_pt_replace-me
+LANGSMITH_PROJECT=ai-agent-dev
+```
+
+LangGraph runs, LLM calls, and node execution will then appear in LangSmith. Each chat session is attached as trace metadata so its turns can be grouped in the LangSmith UI. Prompts, retrieved context, and tool outputs may be recorded; set `LANGSMITH_HIDE_INPUTS=true` and/or `LANGSMITH_HIDE_OUTPUTS=true` when that data should not leave the application.
+
 ### 3. Frontend
 ```powershell
 cd frontend
@@ -41,4 +53,3 @@ npm install
 npm run dev
 ```
 Frontend runs at http://localhost:5173.
-

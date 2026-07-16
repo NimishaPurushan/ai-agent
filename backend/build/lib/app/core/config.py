@@ -1,17 +1,9 @@
 """Application settings loaded from environment / .env."""
 from functools import lru_cache
-from pathlib import Path
 from typing import List
 
-from dotenv import load_dotenv
-from pydantic import Field, SecretStr
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
-
-# LangChain/LangSmith read tracing settings directly from ``os.environ``.
-# Pydantic's ``env_file`` only parses them into Settings, so load the same
-# backend .env file without overwriting values supplied by the deployment.
-load_dotenv(Path(__file__).resolve().parents[2] / ".env", override=False)
 
 
 class Settings(BaseSettings):
@@ -53,11 +45,6 @@ class Settings(BaseSettings):
     # MCP
     mcp_servers_config: str = Field("", alias="MCP_SERVERS_CONFIG")
 
-    # LangSmith observability
-    langsmith_tracing: bool = Field(False, alias="LANGSMITH_TRACING")
-    langsmith_api_key: SecretStr | None = Field(None, alias="LANGSMITH_API_KEY")
-    langsmith_project: str = Field("ai-agent", alias="LANGSMITH_PROJECT")
-
     # App
     app_env: str = Field("dev", alias="APP_ENV")
     log_level: str = Field("INFO", alias="LOG_LEVEL")
@@ -66,15 +53,6 @@ class Settings(BaseSettings):
     @property
     def cors_origin_list(self) -> List[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
-
-    @property
-    def langsmith_enabled(self) -> bool:
-        """Whether tracing is configured with both its switch and API key."""
-        return bool(
-            self.langsmith_tracing
-            and self.langsmith_api_key
-            and self.langsmith_api_key.get_secret_value().strip()
-        )
 
 
 @lru_cache

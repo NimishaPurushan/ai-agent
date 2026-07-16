@@ -135,26 +135,12 @@ def request_confirmation(state: AgentState) -> Dict[str, Any]:
     return {"approved": approved, "proposed_action": action}
 
 
-def execute_tool(state: AgentState) -> Dict[str, Any]:
+async def execute_tool(state: AgentState) -> Dict[str, Any]:
     action = state.get("proposed_action") or {}
     name = action.get("tool", "")
     args = action.get("arguments", {}) or {}
     try:
-        try:
-            loop = asyncio.get_running_loop()
-        except RuntimeError:
-            loop = None
- 
-        if loop and loop.is_running():
-            # Running inside an existing event loop (e.g. pytest-asyncio):
-            # schedule as a coroutine and wait via a future.
-            import concurrent.futures
-            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
-                future = pool.submit(asyncio.run, execute_tool_async(name, args))
-                output = future.result()
-        else:
-            output = asyncio.run(execute_tool_async(name, args))
- 
+        output = await execute_tool_async(name, args)
         result: ToolResult = {"tool": name, "arguments": args, "output": output, "error": None}
         log.info("Tool '%s' executed", name)
     except Exception as e:

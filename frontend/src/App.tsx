@@ -53,7 +53,7 @@ export default function App() {
         ...m,
         {
           role: "system",
-          text: `Agent wants to run tool "${data.proposed_action.tool}". Reason: ${data.proposed_action.rationale}`,
+          text: `Agent wants to run tool "${data? data.proposed_action? data.proposed_action.tool:"":""}". Reason: ${data.proposed_action.rationale}`,
         },
       ]);
       return;
@@ -133,7 +133,6 @@ export default function App() {
           {toolCount ? ` · ${toolCount}` : ""}
         </small>
       </header>
-      <p style={{ color: "#666" }}>Phase 4 — retrieval + planning + confirmation + MCP tools.</p>
 
       <div
         style={{

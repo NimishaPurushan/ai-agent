@@ -54,6 +54,7 @@ def test_graph_tool_path_pauses_then_resumes_approved():
         # Resume with approval
         done = graph.invoke(Command(resume={"approved": True}), config=cfg)
 
+    print(done)
     assert done["tool_result"]["tool"] == "echo"
     assert done["tool_result"]["output"] == {"echo": "hello"}
     assert "Echoed" in done["answer"]

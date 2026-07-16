@@ -46,7 +46,7 @@ def build_graph(checkpointer=None):
             "generate_response": "generate_response",
         },
     )
-    builder.add_edge("execute_tool", "generate_response")
+    # builder.add_edge("execute_tool", "generate_response")
     builder.add_edge("generate_response", END)
 
     return builder.compile(checkpointer=checkpointer)

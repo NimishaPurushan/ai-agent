@@ -1,0 +1,15 @@
+{
+  "servers": {
+    "simple_tools": {
+      "transport": "streamable_http",
+      "url": "http://localhost:9000/mcp",
+      "env": {}
+    },
+    "global":{
+      "transport":"http",
+      "url":"https://api.usefulai.fun/mcp",
+      "env": {}
+    }
+  }
+}
+

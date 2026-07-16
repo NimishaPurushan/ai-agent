@@ -7,7 +7,6 @@ from langgraph.types import Command
 
 from app.agent.graph import get_graph
 from app.agent.tools import list_tools
-from app.core.config import get_settings
 from app.core.logging import get_logger
 from app.schemas import (
     ChatRequest,
@@ -22,19 +21,8 @@ log = get_logger(__name__)
 router = APIRouter(prefix="/api", tags=["chat"])
 
 
-def _config_for(session_id: str, operation: str) -> Dict[str, Any]:
-    """Build LangGraph config with metadata propagated to LangSmith traces."""
-    settings = get_settings()
-    return {
-        "configurable": {"thread_id": session_id},
-        "run_name": f"api_{operation}",
-        "tags": ["ai-agent", f"environment:{settings.app_env}", f"operation:{operation}"],
-        "metadata": {
-            "thread_id": session_id,
-            "environment": settings.app_env,
-            "operation": operation,
-        },
-    }
+def _config_for(session_id: str) -> Dict[str, Any]:
+    return {"configurable": {"thread_id": session_id}}
 
 
 def _build_response(session_id: str, state: Dict[str, Any]) -> ChatResponse:
@@ -79,7 +67,7 @@ async def tools() -> Dict[str, Any]:
 @router.post("/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest) -> ChatResponse:
     graph = get_graph()
-    config = _config_for(req.session_id, "chat")
+    config = _config_for(req.session_id)
     try:
         result = await graph.ainvoke(
             {"messages": [HumanMessage(content=req.message)]},
@@ -94,7 +82,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
 @router.post("/confirm", response_model=ChatResponse)
 async def confirm(req: ConfirmRequest) -> ChatResponse:
     graph = get_graph()
-    config = _config_for(req.session_id, "confirm")
+    config = _config_for(req.session_id)
 
     snapshot = graph.get_state(config)
     pending = any(getattr(t, "interrupts", None) for t in (snapshot.tasks or []))

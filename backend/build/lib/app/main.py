@@ -3,7 +3,6 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from langchain_core.tracers.langchain import wait_for_all_tracers
 
 from app.agent.tools import register_mcp_tools
 from app.api import router
@@ -20,13 +19,6 @@ async def lifespan(app: FastAPI):
     settings = get_settings()
     configure_logging(settings.log_level)
     log.info("Starting backend (env=%s)", settings.app_env)
-    if settings.langsmith_enabled:
-        log.info("LangSmith tracing enabled (project=%s)", settings.langsmith_project)
-    elif settings.langsmith_tracing:
-        log.warning(
-            "LangSmith tracing is enabled but LANGSMITH_API_KEY is not configured; "
-            "traces will not be sent."
-        )
     
     # Load and register MCP tools with the agent
     try:
@@ -40,11 +32,6 @@ async def lifespan(app: FastAPI):
         log.warning("Failed to initialize MCP tools; continuing without them: %s", e)
     
     yield
-    if settings.langsmith_enabled:
-        try:
-            wait_for_all_tracers()
-        except Exception:  # pragma: no cover - best-effort telemetry flush
-            log.warning("Unable to flush pending LangSmith traces", exc_info=True)
     log.info("Shutting down backend")
 
 
@@ -74,3 +61,4 @@ async def health():
         "status": "ok",
         "opensearch": cluster.get("status") if cluster else "unreachable",
     }
+

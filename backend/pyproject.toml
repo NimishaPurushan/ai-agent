@@ -19,6 +19,7 @@ dependencies = [
     "mcp>=1.2",
     "azure-identity>=1.17.0",
     "langchain-mcp-adapters>=0.1",
+    "langsmith>=0.1.147",
 ]
 
 [project.optional-dependencies]
@@ -31,4 +32,3 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["app*"]
-
